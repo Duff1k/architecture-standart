@@ -1,0 +1,31 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(client, "Клиент")
+Person(ccop, "Оператор колл-центра")
+Person(bo_dep, "Бэк-офис депозитов")
+Person(bo_cr, "Бэк-офис кредитов")
+
+System(site, "Сайт", "PHP + React", "Форма заявки, витрина")
+System(ib, "Интернет-банк", "ASP.NET MVC 4.5", "Подача заявки, OTP, статусы")
+System(dg, "Deposit Gateway", "API фасад", "Оркестрация заявок")
+System(prs, "Сервис ставок (PRS)", "MS SQL", "Сетки/персонализация")
+System(aps, "Сервис заявок (APS)", "MS SQL", "Статусы/SLA")
+System(cc, "Система колл-центра", "Spring Boot/React/PostgreSQL", "Обработка обращений")
+System(abs, "АБС", "Oracle/PLSQL", "Открытие депозита")
+System_Ext(smsgw, "СМС-шлюз", "Внешний оператор", "OTP/уведомления")
+
+Rel(client, site, "Заявка/просмотр ставок")
+Rel(client, ib, "Заявка, подтверждение OTP, статусы")
+Rel(site, dg, "TLS API")
+Rel(ib, dg, "TLS API")
+Rel(dg, prs, "Получение ставок")
+Rel(dg, aps, "Создание/чтение заявки")
+Rel(aps, cc, "Передача обращений/статусов")
+Rel(aps, abs, "Асинхронно через адаптер")
+Rel(dg, smsgw, "OTP/уведомления")
+Rel(bo_dep, prs, "Ведение ставок (Admin UI)")
+Rel(bo_cr, prs, "Параметры риска")
+Rel(ccop, cc, "Работа с заявкой")
+
+@enduml

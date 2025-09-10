@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(operator, "Оператор КЦ")
+Person(operator_p, "Оператор партнёрского КЦ")
+
+System(prs, "Сервис ставок (PRS)")
+System(cc, "Система кол-центра банка")
+System_Ext(pcc, "Партнёрский КЦ", "Внешняя система")
+System_Ext(transfer, "Канал передачи файла", "SFTP/шифр. почта")
+
+Rel(operator, cc, "Просмотр ставок")
+Rel(cc, prs, "REST /rates")
+Rel(prs, transfer, "Экспорт файла (CSV/Excel)")
+Rel(transfer, pcc, "Доставка файла")
+Rel(operator_p, pcc, "Работа со ставками из файла")
+
+@enduml
