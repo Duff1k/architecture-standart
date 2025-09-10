@@ -1,0 +1,33 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+Person(client, "Клиент")
+Container(site, "Сайт", "PHP + React", "Форма заявки, витрина")
+Container(ib, "Интернет-банк", "ASP.NET MVC 4.5", "UI монолита, адаптер каналов")
+Container(dg, "Deposit Gateway", ".NET/Java", "API фасад, оркестрация")
+Container(prs, "PRS", ".NET/Java + MS SQL", "Ставки/персонализация, Admin UI")
+Container(aps, "APS", ".NET/Java + MS SQL", "Жизненный цикл заявки")
+Container(abs_ad, "ABS Adapter", ".NET/Java", "Асинхронный мост к Oracle")
+Container(sms_ad, "SMS Adapter", ".NET/Java", "OTP/уведомления")
+Container(cc, "Система КЦ", "Spring Boot/React + PostgreSQL", "Карточка заявки")
+ContainerDb(prs_db, "MS SQL (PRS)", "Реляционная БД")
+ContainerDb(aps_db, "MS SQL (APS)", "Реляционная БД")
+SystemDb_Ext(abs_db, "Oracle (АБС)", "Core banking")
+System_Ext(smsgw, "СМС-шлюз", "Внешний оператор")
+
+Rel(client, site, "HTTPS")
+Rel(client, ib, "HTTPS + OTP")
+Rel(site, dg, "REST/HTTPS")
+Rel(ib, dg, "REST/HTTPS")
+Rel(dg, prs, "REST/HTTPS /rates")
+Rel(prs, prs_db, "JDBC/ADO.NET")
+Rel(dg, aps, "REST/HTTPS /applications")
+Rel(aps, aps_db, "JDBC/ADO.NET")
+Rel(aps, abs_ad, "Async (outbox/polling)")
+Rel(abs_ad, abs_db, "PL/SQL процедуры")
+Rel(dg, sms_ad, "REST/HTTPS")
+Rel(sms_ad, smsgw, "SMPP/HTTPS")
+Rel(cc, aps, "REST/HTTPS (статусы/обновления)")
+
+@enduml

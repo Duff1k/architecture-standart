@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+Container_Boundary(prs_c, "Сервис ставок (PRS)") {
+  Container(prs_api, "API ставок", ".NET/Java", "REST JSON /rates")
+  Container(prs_admin, "Admin UI", "Web UI", "Ведение ставок")
+  Container(prs_export, "Экспорт ставок", "Batch job", "CSV/Excel генерация")
+  ContainerDb(prs_db, "MS SQL", "Репозиторий ставок")
+}
+
+Container_Boundary(cc_c, "Система кол-центра банка") {
+  Container(cc_ui, "UI операторов", "React", "Карточка клиента")
+  Container(cc_rates, "Интеграция ставок", "Spring Boot", "Синхронизация/кэш")
+  ContainerDb(cc_db, "PostgreSQL", "Данные КЦ")
+}
+
+Container_Ext(pcc, "Партнёрский КЦ", "Внешняя система", "Импорт файла")
+Container(transfer, "Передача файла", "SFTP/Шифр. почта", "Надёжная доставка")
+
+Rel(prs_api, cc_rates, "REST/HTTPS")
+Rel(prs_export, transfer, "Файл CSV/Excel")
+Rel(transfer, pcc, "Доставка файла")
+Rel(prs_api, prs_db, "R/W")
+Rel(cc_rates, cc_db, "R/W")
+Rel(cc_ui, cc_rates, "Чтение ставок")
+
+@enduml
